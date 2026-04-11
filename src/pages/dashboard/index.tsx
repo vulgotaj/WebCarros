@@ -28,6 +28,7 @@ interface ImageCarProps {
 
 export function Dashboard() {
   const [cars, setCars] = useState<CarsProps[]>([])
+  const [loadImages, setLoadImages] = useState<string[]>([])
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
@@ -66,6 +67,10 @@ export function Dashboard() {
 
   }, [user])
 
+  function handleImageLoad(id: string) {
+    setLoadImages((prevImageLoaded) => [...prevImageLoaded, id])
+  }
+
   async function handleDeleteCar(car: CarsProps) {
     const itemCar = car;
 
@@ -89,7 +94,7 @@ export function Dashboard() {
     <Container>
       <DashboardHeader/>
 
-      <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <main className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 py-5">
 
         {cars.map( car => (
           <section className="w-full bg-white rounded-lg relative">
@@ -100,24 +105,33 @@ export function Dashboard() {
             >
               <FiTrash2 size={26} color="#000"/>
             </button>
+            <div 
+              className="w-full h-72 rounded-lg bg-slate-200"
+              style={{ display: loadImages.includes(car.id) ? "none" : "block" }}  
+            >
+            </div>
             <img
-              className="w-full rounded-lg mb-2 max-h-70"
+              className="w-full rounded-lg mb-2 h-72 object-cover"
               src={car.images[0].url}
               alt={car.name}
+              onLoad={ () => handleImageLoad(car.id) }
+              style={{ display: loadImages.includes(car.id) ? "block" : "none" }}
             />
 
-            <p className="font-bold mt-1 px-2 mb-2">{car.name}</p>
+            <div className="flex flex-col flex-1 px-2">
+              <p className="font-bold mt-1 px-2 mb-2">{car.name}</p>
 
-            <div className="flex flex-col px-2">
-              <span className="text-zinc-700">
-                Ano {car.year} | {car.km} km
-              </span>
-              <strong className="text-black font-bold mt-4">
-                R$ {car.price}
-              </strong>
+              <div className="flex flex-col px-2">
+                <span className="text-zinc-700">
+                  Ano {car.year} | {car.km} km
+                </span>
+                <strong className="text-black font-bold mt-4">
+                  R$ {car.price}
+                </strong>
+              </div>
             </div>
 
-            <div className="w-full h-px bg-slate-200 my-2"></div>
+            <div className="w-full h-px bg-slate-200 my-2 mt-auto"></div>
 
             <div className="px-2 pb-2">
               <span className="text-black">
